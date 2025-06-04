@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "Backend Microservices - Productos & Inventario",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-123456789000",
+    "description": "Colección de pruebas para microservicios con FastAPI.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Crear Producto",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-API-KEY",
+            "value": "supersecretkey"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Laptop\",\n  \"precio\": 999.99,\n  \"descripcion\": \"Laptop potente con 16GB RAM\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8001/products",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8001",
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "Consultar Producto por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-KEY",
+            "value": "supersecretkey"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8001/products/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8001",
+          "path": ["products", "1"]
+        }
+      }
+    },
+    {
+      "name": "Actualizar Inventario",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quantity\": 10\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8002/inventory/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8002",
+          "path": ["inventory", "1"]
+        }
+      }
+    },
+    {
+      "name": "Consultar Inventario",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8002/inventory/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8002",
+          "path": ["inventory", "1"]
+        }
+      }
+    },
+    {
+      "name": "Realizar Compra",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 2\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8002/inventory/purchase",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8002",
+          "path": ["inventory", "purchase"]
+        }
+      }
+    }
+  ]
+}
