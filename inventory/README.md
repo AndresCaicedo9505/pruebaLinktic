@@ -1,105 +1,122 @@
-# Microservicio Backend: Productos e Inventario
+# Microservicio: Inventoy
 
 ## Descripción
-Este sistema está compuesto por dos microservicios independientes:
 
-- `products`: CRUD de productos
-- `inventory`: gestión de inventario y flujo de compras
 
-Ambos se comunican vía HTTP siguiendo el estándar [JSON:API](https://jsonapi.org/).
+Este microservicio forma parte del sistema de gestión y se encarga de manejar las operaciones relacionadas con el inventario de productos. Permite registrar, consultar y actualizar las cantidades disponibles en stock, además de validar y procesar compras. Forma parte de un sistema desacoplado que incluye también el microservicio `products`, con el que se comunica mediante HTTP.
 
 ---
 
 ## Instalación
 
-1. Clonar el repositorio
-2. Ejecutar `docker-compose up --build`
-3. Acceder a la documentación interactiva:
-   - Productos: http://localhost:8001/docs
-   - Inventario: http://localhost:8002/docs
+1. Clona el repositorio:
+   ```bash
+   git clone 
+   cd inventory
+   ```
+
+2. Instala las dependencias:
+   ```bash
+   poetry install
+   ```
+
+3. Ejecuta las migraciones:
+   ```bash
+   alembic upgrade head
+   ```
+
+4. Levanta el servidor:
+   ```bash
+   poetry run uvicorn app.main:app --reload --port 8002
+   ```
+
+5. Accede a la documentación interactiva:
+   - http://localhost:8002/docs
 
 ---
 
 ## Arquitectura y tecnologías
 
-- Lenguaje: Python 3.11
-- Framework: FastAPI
-- BD: SQLite con Alembic para migraciones
-- Contenedores: Docker + Docker Compose
-- Comunicación: HTTP + JSON:API + API Key
-- Dependencias: Poetry
-- Testing: Pytest + HTTPX
+- **Lenguaje**: Python 3.11
+- **Framework**: FastAPI
+- **ORM**: SQLAlchemy
+- **Migraciones**: Alembic
+- **Gestión de dependencias**: Poetry
+- **Base de datos**: SQLite
+- **Testing**: Pytest + HTTPX
+- **Validaciones y configuración**: Pydantic + pydantic-settings
 
-Estructura hexagonal con capas:
-- `domain`: modelos y esquemas
-- `repository`: acceso a datos
-- `services`: lógica de negocio
-- `api`: rutas y controladores
-- `clients`: comunicación entre servicios
+Estructura basada en capas:
 
----
-
-## Seguridad y Autenticación
-
-Cada request entre servicios incluye una API Key en el header `X-API-KEY`. Esta clave se valida antes de hacer la solicitud.
+- `app/models`: definición de modelos SQLAlchemy
+- `app/schemas`: Pydantic schemas para entrada/salida
+- `app/api`: rutas y controladores
+- `app/services`: lógica de negocio
+- `app/core`: configuración y base de datos
+- `app/clients`: comunicación https con otros microservicios
 
 ---
 
-## Flujo de Compra
+## Seguridad
 
-1. Cliente envía `POST /inventory/purchase` con `product_id` y `quantity`
-2. Inventory consulta vía HTTP al microservicio `products`
-3. Verifica existencia y stock
-4. Descuenta cantidad
-5. Devuelve la confirmación de compra
+Este microservicio puede validar solicitudes externas mediante un header `X-API-KEY`, si se implementa junto con sistemas externos como `products`.
 
 ---
 
-## 📊 Diagramas
+## Endpoints principales
 
-- `docs/architecture_diagram.png`: vista de microservicios
-- `docs/compra_flujo.png`: flujo de la operación de compra
+- `GET /inventory/{product_id}` → Trae el producto registrado en inventario y su cantidad
+- `PUT /inventory/{product_id}` → Actualiza la cantidad de un producto por ID
+- `POST /inventory/purchase` → Realiza compra de los productos
 
 ---
 
-## 🧪 Pruebas
+## Pruebas
+
+1. Ejecuta pruebas unitarias:
 
 ```bash
-cd products
-poetry run pytest
-
-cd ../inventory
 poetry run pytest
 ```
 
+2. Con cobertura de código:
 
-## ✅ Checklist de requisitos
-
-- [x] Microservicios desacoplados
-- [x] Comunicación HTTP con autenticación
-- [x] Docker + Compose
-- [x] Alembic + SQLite
-- [x] Tests unitarios e integración
-- [x] JSON:API cumplido
-- [x] README y diagramas
+```bash
+poetry run pytest --cov=app --cov-report=term-missing
+```
 
 ---
 
-# 📁 Diagramas (descripción)
+## Comunicación con otros microservicios
 
-## 🧱 Arquitectura general
+Este microservicio puede enviar solicitudes HTTP a `products`, por ejemplo:
+
 ```
-[ Cliente ]
-    |
-    V
-[ inventory ] <-- HTTP --> [ products ]
+GET /products/{product_id}
 ```
 
-## 🔄 Flujo de compra
+Usado para validar existencia y datos del producto antes de registrar una compra.
+
+---
+
+## Configuración con `.env`
+
+Este proyecto puede usar variables de entorno definidas en un archivo `.env`:
+
 ```
-POST /inventory/purchase
-    ├─> GET /products/{id}    (validación existencia)
-    ├─> validar stock
-    └─> actualizar inventario y responder
+DATABASE_URL=sqlite:///./products.db
+API_KEY=supersecret
 ```
 
+---
+
+## Checklist
+
+- [x] CRUD de productos funcional
+- [x] Base de datos SQLite
+- [x] Alembic configurado
+- [x] Tests con cobertura
+- [x] API Key opcional
+- [x] Integración lista con `inventory`
+- [x] Documentación Swagger (OpenAPI)
+- [x] Poetry como gestor de entorno
